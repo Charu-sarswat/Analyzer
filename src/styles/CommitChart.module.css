@@ -1,87 +1,378 @@
 .container {
     width: 100%;
     margin-top: 1rem;
-    padding: 1.5rem;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    background-color: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: var(--gradient-primary);
 }
 
 .heading {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     margin-top: 0;
-    margin-bottom: 1.5rem;
-    color: #333;
+    margin-bottom: 1.8rem;
+    color: var(--text-primary);
     text-align: center;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.heading::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-sm);
+}
+
+/* Commit Statistics Styles */
+.commitStats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.statCard {
+    background-color: white;
+    padding: 2rem 1.5rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    min-width: 180px;
+    flex: 1;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s var(--ease-bounce), box-shadow 0.3s ease;
+    border: 1px solid var(--border-light);
+}
+
+.statCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--gradient-primary);
+}
+
+.pulseOnHover:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.statValue {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 0.8rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+}
+
+.statCounter {
+    display: inline-block;
+    position: relative;
+    animation: countUp 2s var(--ease-bounce) forwards;
+}
+
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.statDay {
+    display: inline-block;
+    position: relative;
+    animation: fadeInRotate 1.5s var(--ease-bounce) forwards;
+}
+
+@keyframes fadeInRotate {
+    from {
+        opacity: 0;
+        transform: rotateY(60deg);
+    }
+
+    to {
+        opacity: 1;
+        transform: rotateY(0);
+    }
+}
+
+.statLabel {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.2rem;
+    font-weight: 600;
+}
+
+.statSubLabel {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.statIcon {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 24px;
+    height: 24px;
+    opacity: 0.2;
+    color: var(--primary);
+    transition: all 0.3s ease;
+}
+
+.statCard:hover .statIcon {
+    opacity: 0.6;
+    transform: scale(1.1);
+}
+
+/* Repository Distribution Styles */
+.repoDistribution {
+    background-color: white;
+    padding: 2rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+}
+
+.repoDistribution::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--gradient-cool);
+}
+
+.floating:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.repoChartContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem;
+}
+
+.repoPieChart {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.pieChartOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.pieChartCenterText {
+    background: white;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    animation: pulse 2s infinite alternate;
+}
+
+.pieChartCenterText span {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+}
+
+.pieChartCenterText small {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-top: 0.2rem;
+}
+
+.repoStatsList {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.repoStatItem {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.2rem;
+    border-radius: var(--radius-md);
+    background-color: #f8fafc;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.repoStatItem:hover {
+    background-color: #f1f5f9;
+    transform: translateX(8px);
+    border-color: var(--border-light);
+}
+
+.repoColorIndicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.repoName {
+    font-weight: 600;
+    flex: 2;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.repoCommits {
+    margin-left: auto;
+    margin-right: 1.5rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.repoPercentage {
+    min-width: 70px;
+    text-align: right;
+    font-weight: 700;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.percentCircle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-block;
 }
 
 .subheading {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     margin-top: 0;
-    margin-bottom: 1rem;
-    color: #333;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
     text-align: center;
-}
-
-.charts {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-.chart {
-    background-color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.dailyTrendChart {
-    background-color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    margin-bottom: 2rem;
+    font-weight: 600;
 }
 
 /* GitHub-style heatmap */
 .heatmapContainer {
     background-color: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    margin-bottom: 2rem;
+    padding: 2rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2.5rem;
     overflow-x: auto;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--border-light);
+}
+
+.heatmapContainer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #40c463, #216e39);
+}
+
+.heatmapContainer:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
 }
 
 .noDataMessage {
     text-align: center;
-    padding: 2rem;
+    padding: 3rem 2rem;
     color: #666;
     font-style: italic;
     background-color: #f8f9fa;
-    border-radius: 4px;
-    margin: 1rem 0;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.03);
 }
 
 .heatmap {
     display: flex;
     flex-direction: row;
     margin-left: 2.5rem;
-    /* Space for week labels */
+    padding: 1rem 0;
 }
 
 .heatmapLabel {
     margin-left: 2.5rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
+    font-weight: 500;
+    color: #555;
 }
 
 .heatmapDayLabels {
     display: flex;
     justify-content: space-between;
-    font-size: 0.7rem;
-    color: #767676;
+    font-size: 0.75rem;
+    color: #666;
+    font-weight: 500;
 }
 
 .heatmapDayLabels div {
@@ -97,11 +388,12 @@
 }
 
 .weekLabel {
-    font-size: 0.7rem;
-    color: #767676;
+    font-size: 0.75rem;
+    color: #666;
     width: 2.5rem;
     text-align: right;
-    padding-right: 0.5rem;
+    padding-right: 0.8rem;
+    font-weight: 500;
 }
 
 .heatmapDays {
@@ -112,9 +404,16 @@
     width: 15px;
     height: 15px;
     margin: 2px;
-    border-radius: 2px;
+    border-radius: 3px;
     position: relative;
     cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.heatmapDay:hover {
+    transform: scale(1.4);
+    z-index: 10;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 .dayTooltip {
@@ -122,52 +421,160 @@
     background-color: rgba(0, 0, 0, 0.8);
     color: white;
     text-align: center;
-    border-radius: 4px;
-    padding: 4px 8px;
+    border-radius: 6px;
+    padding: 6px 10px;
     position: absolute;
-    z-index: 1;
+    z-index: 20;
     bottom: 125%;
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s, transform 0.3s;
+    transform: translateX(-50%) translateY(5px);
+    font-weight: 500;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 .heatmapDay:hover .dayTooltip {
     visibility: visible;
     opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
 .heatmapLegend {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 1rem;
-    font-size: 0.7rem;
-    color: #767676;
+    margin-top: 1.5rem;
+    font-size: 0.75rem;
+    color: #666;
+    font-weight: 500;
 }
 
 .heatmapLegendItem {
     width: 15px;
     height: 15px;
-    margin: 0 2px;
-    border-radius: 2px;
+    margin: 0 3px;
+    border-radius: 3px;
+    transition: transform 0.2s ease;
+}
+
+.heatmapLegendItem:hover {
+    transform: scale(1.2);
+}
+
+/* Chart containers */
+.dailyTrendChart {
+    background-color: white;
+    padding: 1.8rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dailyTrendChart::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #ff6b6b 0%, #ffc078 100%);
+}
+
+.dailyTrendChart:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+}
+
+.charts {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    margin-top: 0;
+}
+
+.chart {
+    background-color: white;
+    padding: 1.8rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chart::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+}
+
+.chart:nth-child(1)::before {
+    background: linear-gradient(90deg, #748ffc 0%, #a3daff 100%);
+}
+
+.chart:nth-child(2)::before {
+    background: linear-gradient(90deg, #69db7c 0%, #8ce99a 100%);
+}
+
+.chart:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
 }
 
 .loading {
     text-align: center;
-    padding: 2rem;
-    font-size: 1rem;
+    padding: 3rem;
+    font-size: 1.1rem;
     color: #666;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    margin: 1.5rem 0;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #4a6cf7, #2e8b88, #4a6cf7);
+    background-size: 200% 100%;
+    animation: loadingAnimation 1.5s infinite;
+    bottom: 0;
+    left: 0;
+}
+
+@keyframes loadingAnimation {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: 0 0;
+    }
 }
 
 .disclaimer {
-    margin-top: 1.5rem;
-    font-size: 0.8rem;
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    font-size: 0.85rem;
     color: #666;
     text-align: center;
+    border-left: 3px solid #ddd;
 }
 
 @media (min-width: 992px) {
@@ -176,6 +583,21 @@
     }
 
     .chart {
+        flex: 1;
+    }
+}
+
+@media (min-width: 768px) {
+    .repoChartContainer {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .repoPieChart {
+        flex: 1;
+    }
+
+    .repoStatsList {
         flex: 1;
     }
 }

@@ -9,8 +9,10 @@ import {
     Legend,
     PointElement,
     LineElement,
+    Filler,
+    ArcElement,
 } from 'chart.js';
-import { Bar, Line } from 'react-chartjs-2';
+import { Bar, Line, Pie } from 'react-chartjs-2';
 import styles from '@/styles/CommitChart.module.css';
 
 // Register ChartJS components
@@ -20,6 +22,8 @@ ChartJS.register(
     BarElement,
     PointElement,
     LineElement,
+    Filler,
+    ArcElement,
     Title,
     Tooltip,
     Legend
@@ -31,8 +35,14 @@ interface CommitActivity {
     week: number;
 }
 
+interface RepoCommitInfo {
+    name: string;
+    commits: number;
+}
+
 interface CommitChartProps {
     commitActivity: CommitActivity[];
+    repoCommits?: RepoCommitInfo[];
 }
 
 // Colors for heat map intensity
@@ -44,18 +54,111 @@ const getHeatMapColor = (intensity: number): string => {
     return '#216e39';
 };
 
-const CommitChart: React.FC<CommitChartProps> = ({ commitActivity }) => {
+// Colors for the pie chart
+const pieChartColors = [
+    'rgba(54, 162, 235, 0.7)',
+    'rgba(255, 99, 132, 0.7)',
+    'rgba(255, 206, 86, 0.7)',
+    'rgba(75, 192, 192, 0.7)',
+    'rgba(153, 102, 255, 0.7)',
+    'rgba(255, 159, 64, 0.7)',
+    'rgba(199, 199, 199, 0.7)',
+    'rgba(83, 102, 255, 0.7)',
+    'rgba(40, 159, 64, 0.7)',
+    'rgba(210, 199, 199, 0.7)',
+];
+
+const CommitChart: React.FC<CommitChartProps> = ({ commitActivity, repoCommits = [] }) => {
     const [chartData, setChartData] = useState<any>(null);
     const [dailyTrend, setDailyTrend] = useState<any>(null);
     const [calendarData, setCalendarData] = useState<Array<{ date: string, count: number }>>([]);
     const [maxCommits, setMaxCommits] = useState(0);
+    const [commitStats, setCommitStats] = useState<{
+        totalCommits: number;
+        averagePerWeek: number;
+        mostActiveDay: string;
+        mostActiveDayCount: number;
+    }>({
+        totalCommits: 0,
+        averagePerWeek: 0,
+        mostActiveDay: '',
+        mostActiveDayCount: 0
+    });
+    const [repoDistribution, setRepoDistribution] = useState<any>(null);
 
     useEffect(() => {
         if (!commitActivity || commitActivity.length === 0) return;
 
         // Process commit activity data for chart
         processCommitData();
-    }, [commitActivity]);
+
+        // Process repository commit distribution
+        if (repoCommits && repoCommits.length > 0) {
+            processRepoCommits();
+        }
+    }, [commitActivity, repoCommits]);
+
+    const processRepoCommits = () => {
+        if (!repoCommits || repoCommits.length === 0) return;
+
+        // Calculate total commits across all repos
+        const totalCommits = repoCommits.reduce((sum, repo) => sum + repo.commits, 0);
+
+        // Prepare data for pie chart
+        const repoLabels = repoCommits.map(repo => repo.name);
+        const repoData = repoCommits.map(repo => repo.commits);
+        const repoPercentages = repoCommits.map(repo =>
+            Math.round((repo.commits / totalCommits) * 100)
+        );
+
+        // Chart data
+        const pieData = {
+            labels: repoLabels,
+            datasets: [
+                {
+                    data: repoData,
+                    backgroundColor: pieChartColors.slice(0, repoCommits.length),
+                    borderColor: pieChartColors.slice(0, repoCommits.length).map(color => color.replace('0.7', '1')),
+                    borderWidth: 1,
+                }
+            ]
+        };
+
+        // Chart options
+        const pieOptions = {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right' as const,
+                },
+                title: {
+                    display: true,
+                    text: 'Commits by Repository',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context: any) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const percentage = repoPercentages[context.dataIndex];
+                            return `${label}: ${value} commits (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+        };
+
+        setRepoDistribution({
+            data: pieData,
+            options: pieOptions,
+            repoStats: repoCommits.map((repo, index) => ({
+                name: repo.name,
+                commits: repo.commits,
+                percentage: repoPercentages[index],
+                color: pieChartColors[index % pieChartColors.length]
+            }))
+        });
+    };
 
     const processCommitData = () => {
         // Make sure we have valid data
@@ -91,6 +194,24 @@ const CommitChart: React.FC<CommitChartProps> = ({ commitActivity }) => {
                 }
             });
 
+            // Calculate commit statistics
+            const totalCommits = lastWeeks.reduce((sum, week) => sum + (week.total || 0), 0);
+            const averagePerWeek = totalCommits / lastWeeks.length;
+
+            // Find most active day
+            const dayLabels = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const mostActiveDayIndex = dailyData.indexOf(Math.max(...dailyData));
+            const mostActiveDay = dayLabels[mostActiveDayIndex];
+            const mostActiveDayCount = dailyData[mostActiveDayIndex];
+
+            // Set commit statistics
+            setCommitStats({
+                totalCommits,
+                averagePerWeek: Math.round(averagePerWeek * 10) / 10, // Round to 1 decimal
+                mostActiveDay,
+                mostActiveDayCount
+            });
+
             // Get weekly commit counts
             const weeklyData = lastWeeks.map(week => week.total || 0);
 
@@ -121,8 +242,6 @@ const CommitChart: React.FC<CommitChartProps> = ({ commitActivity }) => {
             };
 
             // Prepare daily chart data
-            const dayLabels = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
             const dailyChartData = {
                 labels: dayLabels,
                 datasets: [
@@ -384,6 +503,90 @@ const CommitChart: React.FC<CommitChartProps> = ({ commitActivity }) => {
     return (
         <div className={styles.container}>
             <h2 className={styles.heading}>Commit Activity</h2>
+
+            <div className={styles.commitStats}>
+                <div className={`${styles.statCard} ${styles.pulseOnHover}`}>
+                    <div className={styles.statValue}>
+                        <span className={styles.statCounter}>{commitStats.totalCommits}</span>
+                    </div>
+                    <div className={styles.statLabel}>Total Commits</div>
+                    <div className={styles.statIcon}>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div className={`${styles.statCard} ${styles.pulseOnHover}`}>
+                    <div className={styles.statValue}>
+                        <span className={styles.statCounter}>{commitStats.averagePerWeek}</span>
+                    </div>
+                    <div className={styles.statLabel}>Avg. Commits per Week</div>
+                    <div className={styles.statIcon}>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="12" y1="2" x2="12" y2="6"></line>
+                            <line x1="12" y1="18" x2="12" y2="22"></line>
+                            <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                            <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                            <line x1="2" y1="12" x2="6" y2="12"></line>
+                            <line x1="18" y1="12" x2="22" y2="12"></line>
+                            <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                            <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                        </svg>
+                    </div>
+                </div>
+                <div className={`${styles.statCard} ${styles.pulseOnHover}`}>
+                    <div className={styles.statValue}>
+                        <span className={styles.statDay}>{commitStats.mostActiveDay}</span>
+                    </div>
+                    <div className={styles.statLabel}>Most Active Day</div>
+                    <div className={styles.statSubLabel}>({commitStats.mostActiveDayCount} commits)</div>
+                    <div className={styles.statIcon}>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            {repoDistribution && (
+                <div className={`${styles.repoDistribution} ${styles.floating}`}>
+                    <h3 className={styles.subheading}>Repository Contributions</h3>
+
+                    <div className={styles.repoChartContainer}>
+                        <div className={styles.repoPieChart}>
+                            <Pie data={repoDistribution.data} options={repoDistribution.options} />
+                            <div className={styles.pieChartOverlay}>
+                                <div className={styles.pieChartCenterText}>
+                                    <span>{repoDistribution.repoStats.reduce((sum: number, repo: any) => sum + repo.commits, 0)}</span>
+                                    <small>Total</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={styles.repoStatsList}>
+                            {repoDistribution.repoStats.map((repo: any, index: number) => (
+                                <div key={index} className={styles.repoStatItem}>
+                                    <div
+                                        className={styles.repoColorIndicator}
+                                        style={{ backgroundColor: repo.color }}
+                                    ></div>
+                                    <div className={styles.repoName}>{repo.name}</div>
+                                    <div className={styles.repoCommits}>{repo.commits} commits</div>
+                                    <div className={styles.repoPercentage}>
+                                        <div className={styles.percentCircle} style={{
+                                            background: `conic-gradient(${repo.color} 0% ${repo.percentage}%, transparent ${repo.percentage}% 100%)`
+                                        }}></div>
+                                        <span>{repo.percentage}%</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {renderCalendarHeatmap()}
 

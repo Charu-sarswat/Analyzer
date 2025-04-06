@@ -81,7 +81,12 @@ const RepositoryList: React.FC<RepositoryListProps> = ({ repositories }) => {
 
                             <div className={styles.repoDetails}>
                                 {repo.language && (
-                                    <span className={styles.language}>{repo.language}</span>
+                                    <span
+                                        className={styles.language}
+                                        data-lang={repo.language}
+                                    >
+                                        {repo.language}
+                                    </span>
                                 )}
 
                                 <span className={styles.stars}>
