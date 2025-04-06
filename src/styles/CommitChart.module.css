@@ -1,0 +1,181 @@
+.container {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.heading {
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #333;
+    text-align: center;
+}
+
+.subheading {
+    font-size: 1.1rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #333;
+    text-align: center;
+}
+
+.charts {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.chart {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.dailyTrendChart {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+/* GitHub-style heatmap */
+.heatmapContainer {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+    overflow-x: auto;
+}
+
+.noDataMessage {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-style: italic;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    margin: 1rem 0;
+}
+
+.heatmap {
+    display: flex;
+    flex-direction: row;
+    margin-left: 2.5rem;
+    /* Space for week labels */
+}
+
+.heatmapLabel {
+    margin-left: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.heatmapDayLabels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: #767676;
+}
+
+.heatmapDayLabels div {
+    width: 15px;
+    text-align: center;
+}
+
+.heatmapWeek {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-right: 4px;
+}
+
+.weekLabel {
+    font-size: 0.7rem;
+    color: #767676;
+    width: 2.5rem;
+    text-align: right;
+    padding-right: 0.5rem;
+}
+
+.heatmapDays {
+    display: flex;
+}
+
+.heatmapDay {
+    width: 15px;
+    height: 15px;
+    margin: 2px;
+    border-radius: 2px;
+    position: relative;
+    cursor: pointer;
+}
+
+.dayTooltip {
+    visibility: hidden;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    text-align: center;
+    border-radius: 4px;
+    padding: 4px 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 0.7rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.heatmapDay:hover .dayTooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.heatmapLegend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+    font-size: 0.7rem;
+    color: #767676;
+}
+
+.heatmapLegendItem {
+    width: 15px;
+    height: 15px;
+    margin: 0 2px;
+    border-radius: 2px;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1rem;
+    color: #666;
+}
+
+.disclaimer {
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    color: #666;
+    text-align: center;
+}
+
+@media (min-width: 992px) {
+    .charts {
+        flex-direction: row;
+    }
+
+    .chart {
+        flex: 1;
+    }
+}

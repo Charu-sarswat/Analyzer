@@ -1,0 +1,116 @@
+.profile {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.avatar img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.info {
+    flex: 1;
+}
+
+.info h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.username {
+    font-size: 1rem;
+    color: #6e6e6e;
+    text-decoration: none;
+    margin-left: 0.5rem;
+    transition: color 0.2s;
+}
+
+.username:hover {
+    color: #0070f3;
+    text-decoration: underline;
+}
+
+.bio {
+    font-size: 1rem;
+    color: #333;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.detail {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.detail a {
+    color: #0070f3;
+    text-decoration: none;
+}
+
+.detail a:hover {
+    text-decoration: underline;
+}
+
+.icon {
+    margin-right: 0.25rem;
+}
+
+.stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.count {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.label {
+    font-size: 0.9rem;
+    color: #6e6e6e;
+}
+
+@media (max-width: 600px) {
+    .profile {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .details,
+    .stats {
+        justify-content: center;
+    }
+}
