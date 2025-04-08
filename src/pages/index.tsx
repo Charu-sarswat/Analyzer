@@ -242,7 +242,7 @@ export default function Home() {
                     console.log('No commit activity found, using demo data');
 
                     // Generate demo repo commit info for fallback
-                    const demoRepoCommits = reposForActivity.map(repo => {
+                    const demoRepoCommits = reposForActivity.map((repo: Repository) => {
                         const commits = Math.floor(Math.random() * 200) + 50;
                         return {
                             name: repo.name,
