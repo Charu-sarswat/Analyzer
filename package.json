@@ -17,8 +17,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@date-io/date-fns": "^3.2.1",
     "axios": "^1.6.8",
     "chart.js": "^4.4.2",
+    "date-fns": "^4.1.0",
     "next": "^14.2.3",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",

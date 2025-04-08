@@ -1,0 +1,162 @@
+.container {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 2rem;
+    background-color: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: var(--gradient-primary);
+}
+
+.heading {
+    font-size: 1.8rem;
+    margin-top: 0;
+    margin-bottom: 1.8rem;
+    color: var(--text-primary);
+    text-align: center;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.heading::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-sm);
+}
+
+/* Commit Statistics Styles */
+.commitStats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.statCard {
+    background-color: white;
+    padding: 2rem 1.5rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    min-width: 180px;
+    flex: 1;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s var(--ease-bounce), box-shadow 0.3s ease;
+    border: 1px solid var(--border-light);
+}
+
+.statCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--gradient-primary);
+}
+
+.pulseOnHover:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.statValue {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.8rem;
+    position: relative;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.statCounter {
+    display: inline-block;
+    position: relative;
+    animation: countUp 2s var(--ease-bounce) forwards;
+}
+
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.statDay {
+    display: inline-block;
+    position: relative;
+    animation: fadeInRotate 1.5s var(--ease-bounce) forwards;
+}
+
+@keyframes fadeInRotate {
+    from {
+        opacity: 0;
+        transform: rotateY(60deg);
+    }
+
+    to {
+        opacity: 1;
+        transform: rotateY(0);
+    }
+}
+
+.statLabel {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.2rem;
+    font-weight: 600;
+}
+
+.statSubLabel {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.statIcon {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 24px;
+    height: 24px;
+    opacity: 0.2;
+    color: var(--primary);
+    transition: all 0.3s ease;
+}
+
+.statCard:hover .statIcon {
+    opacity: 0.6;
+    transform: scale(1.1);
+}
+
+.statCard:hover .statValue {
+    color: #4a6cf7;
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}

@@ -4,6 +4,7 @@ import axios from 'axios';
 import UserProfile from '@/components/UserProfile';
 import RepositoryList from '@/components/RepositoryList';
 import CommitChart from '@/components/CommitChart';
+import TotalCommits from '@/components/TotalCommits';
 import styles from '@/styles/Home.module.css';
 
 interface Repository {
@@ -38,6 +39,13 @@ export default function Home() {
     const [dataFetched, setDataFetched] = useState(false);
     const [isRateLimited, setIsRateLimited] = useState(false);
     const [useDemoData, setUseDemoData] = useState(false);
+    const [totalCommits, setTotalCommits] = useState(0);
+    const [averageCommitsPerWeek, setAverageCommitsPerWeek] = useState(0);
+    const [mostActiveDay, setMostActiveDay] = useState('');
+    const [mostActiveDayCount, setMostActiveDayCount] = useState(0);
+    const [githubToken, setGithubToken] = useState('');
+    const [showTokenInput, setShowTokenInput] = useState(false);
+    const [rateLimitInfo, setRateLimitInfo] = useState<{ remaining: number, reset: number } | null>(null);
 
     // Check if we're rate limited on initial load
     useEffect(() => {
@@ -46,16 +54,28 @@ export default function Home() {
 
     const checkRateLimit = async () => {
         try {
-            // Only use safe headers in browser environment
-            const response = await axios.get('https://api.github.com/rate_limit', {
-                headers: { 'Accept': 'application/vnd.github.v3+json' }
-            });
+            // Prepare headers with token if available
+            const headers: any = { 'Accept': 'application/vnd.github.v3+json' };
+            if (githubToken) {
+                headers['Authorization'] = `token ${githubToken}`;
+            }
+
+            const response = await axios.get('https://api.github.com/rate_limit', { headers });
             const remaining = response.data.rate.remaining;
-            console.log(`GitHub API rate limit remaining: ${remaining}`);
+            const reset = response.data.rate.reset;
+            console.log(`GitHub API rate limit remaining: ${remaining}, resets at: ${new Date(reset * 1000).toLocaleTimeString()}`);
+
+            setRateLimitInfo({ remaining, reset });
 
             if (remaining <= 10) {
                 setIsRateLimited(true);
                 setError(`GitHub API rate limit low (${remaining} requests remaining). Results may be limited.`);
+
+                // Automatically switch to demo mode if rate limit is low
+                if (!useDemoData) {
+                    setUseDemoData(true);
+                    setError('GitHub API rate limit reached. Automatically switched to demo mode.');
+                }
             } else {
                 setIsRateLimited(false);
             }
@@ -65,6 +85,13 @@ export default function Home() {
             console.error('Error checking rate limit:', err);
             setIsRateLimited(true);
             setError('Unable to check GitHub API rate limit. You may be rate limited.');
+
+            // Automatically switch to demo mode if we can't check rate limit
+            if (!useDemoData) {
+                setUseDemoData(true);
+                setError('GitHub API rate limit reached. Automatically switched to demo mode.');
+            }
+
             return 0;
         }
     };
@@ -103,8 +130,10 @@ export default function Home() {
                 };
             });
 
+            const demoCommitActivity = generateDemoCommitData();
             setRepoCommits(demoRepoCommits);
-            setCommitActivity(generateDemoCommitData());
+            setCommitActivity(demoCommitActivity);
+            processCommitData(demoCommitActivity);
             setDataFetched(true);
             setLoading(false);
             return;
@@ -119,10 +148,11 @@ export default function Home() {
         }
 
         try {
-            // Use only safe headers for browser environment
-            const headers = {
-                'Accept': 'application/vnd.github.v3+json'
-            };
+            // Prepare headers with token if available
+            const headers: any = { 'Accept': 'application/vnd.github.v3+json' };
+            if (githubToken) {
+                headers['Authorization'] = `token ${githubToken}`;
+            }
 
             // Fetch user data
             console.log(`Fetching data for user: ${username}`);
@@ -161,7 +191,7 @@ export default function Home() {
 
                 // Fetch commit activity (limit to 5 repos to avoid rate limiting)
                 const reposForActivity = repos.slice(0, 5);
-                let activityData: any[] = [];
+                let activityData: CommitActivity[] = [];
                 let repoCommitInfo: RepoCommitInfo[] = [];
 
                 for (const repo of reposForActivity) {
@@ -173,7 +203,13 @@ export default function Home() {
                         );
 
                         if (Array.isArray(response.data) && response.data.length > 0) {
-                            activityData = [...activityData, ...response.data];
+                            // Add repo name to each week's data for tracking
+                            const repoData = response.data.map((week: CommitActivity) => ({
+                                ...week,
+                                repoName: repo.name
+                            }));
+
+                            activityData = [...activityData, ...repoData];
 
                             // Calculate total commits for this repo
                             const repoTotalCommits = response.data.reduce(
@@ -201,6 +237,7 @@ export default function Home() {
                 if (activityData.length > 0) {
                     setCommitActivity(activityData);
                     setRepoCommits(repoCommitInfo);
+                    processCommitData(activityData);
                 } else {
                     console.log('No commit activity found, using demo data');
 
@@ -257,7 +294,14 @@ export default function Home() {
         // Generate 12 weeks of demo data
         for (let i = 0; i < 12; i++) {
             const weekTimestamp = now - (11 - i) * oneWeek;
-            const days = Array(7).fill(0).map(() => Math.floor(Math.random() * 5)); // 0-4 commits per day
+
+            // Create more realistic commit pattern (weekdays have more commits)
+            const days = Array(7).fill(0).map((_, dayIndex) => {
+                // Weekdays (1-5) have more commits than weekends (0,6)
+                const isWeekday = dayIndex > 0 && dayIndex < 6;
+                const baseCommits = isWeekday ? 3 : 1;
+                return Math.floor(Math.random() * baseCommits) + (isWeekday ? 1 : 0);
+            });
 
             weeks.push({
                 week: weekTimestamp,
@@ -266,7 +310,8 @@ export default function Home() {
             });
         }
 
-        return weeks;
+        // Sort by week timestamp (newest first)
+        return weeks.sort((a, b) => b.week - a.week);
     };
 
     const toggleDemoData = () => {
@@ -279,10 +324,11 @@ export default function Home() {
         setLoading(true);
         setError('');
 
-        // Use only safe headers in browser environment
-        const headers = {
-            'Accept': 'application/vnd.github.v3+json'
-        };
+        // Prepare headers with token if available
+        const headers: any = { 'Accept': 'application/vnd.github.v3+json' };
+        if (githubToken) {
+            headers['Authorization'] = `token ${githubToken}`;
+        }
 
         try {
             console.log(`Fetching commit activity for ${repoName}...`);
@@ -298,6 +344,18 @@ export default function Home() {
                 // Check rate limit info in headers
                 const rateLimit = repoCheckResponse.headers['x-ratelimit-remaining'];
                 console.log(`GitHub API rate limit remaining: ${rateLimit || 'unknown'}`);
+
+                // If rate limit is low, switch to demo mode
+                if (rateLimit && parseInt(rateLimit) <= 5) {
+                    console.log('Rate limit low, switching to demo mode');
+                    setUseDemoData(true);
+                    setIsRateLimited(true);
+                    setError('GitHub API rate limit reached. Automatically switched to demo mode.');
+                    setCommitActivity(generateDemoCommitData());
+                    setDataFetched(true);
+                    setLoading(false);
+                    return;
+                }
             } catch (repoErr: any) {
                 if (repoErr.response && repoErr.response.status === 404) {
                     console.error(`Repository ${repoName} not found or not accessible.`);
@@ -306,7 +364,11 @@ export default function Home() {
                     return;
                 } else if (repoErr.response && repoErr.response.status === 403) {
                     console.error('Rate limit exceeded when checking repository');
-                    setError('GitHub API rate limit exceeded. Please try again later or use demo data.');
+                    setError('GitHub API rate limit exceeded. Automatically switched to demo mode.');
+                    setUseDemoData(true);
+                    setIsRateLimited(true);
+                    setCommitActivity(generateDemoCommitData());
+                    setDataFetched(true);
                     setLoading(false);
                     return;
                 }
@@ -323,7 +385,9 @@ export default function Home() {
             // Handle rate limiting explicitly
             if (response.status === 403) {
                 console.error('Rate limit exceeded when fetching commit activity');
-                setError('GitHub API rate limit exceeded. Please try again later or use demo data.');
+                setError('GitHub API rate limit exceeded. Automatically switched to demo mode.');
+                setUseDemoData(true);
+                setIsRateLimited(true);
                 setCommitActivity(generateDemoCommitData());
                 setDataFetched(true);
                 setLoading(false);
@@ -353,7 +417,9 @@ export default function Home() {
                 } catch (retryErr: any) {
                     if (retryErr.response && retryErr.response.status === 403) {
                         console.error('Rate limit exceeded during retry');
-                        setError('GitHub API rate limit exceeded. Please try again later or use demo data.');
+                        setError('GitHub API rate limit exceeded. Automatically switched to demo mode.');
+                        setUseDemoData(true);
+                        setIsRateLimited(true);
                     } else {
                         console.warn(`Failed to get commit data for ${repoName} on retry`);
                         setError(`Unable to fetch commit data for "${repoName}". GitHub API may be rate limited.`);
@@ -378,6 +444,7 @@ export default function Home() {
                 }]);
 
                 setCommitActivity(response.data);
+                processCommitData(response.data);
             }
             // If repository not found or no access (404 response)
             else if (response.status === 404) {
@@ -402,8 +469,9 @@ export default function Home() {
                 console.error('Response data:', err.response.data);
 
                 if (err.response.status === 403) {
-                    errorMessage = `GitHub API rate limit exceeded. Please try again later or use demo data.`;
+                    errorMessage = `GitHub API rate limit exceeded. Automatically switched to demo mode.`;
                     setIsRateLimited(true);
+                    setUseDemoData(true);
                 } else if (err.response.status === 404) {
                     errorMessage = `Repository "${repoName}" not found or not accessible.`;
                 }
@@ -424,6 +492,89 @@ export default function Home() {
             setLoading(false);
         }
     };
+
+    const processCommitData = (data: CommitActivity[]) => {
+        if (!data || data.length === 0) {
+            setTotalCommits(0);
+            setAverageCommitsPerWeek(0);
+            setMostActiveDay('No data');
+            setMostActiveDayCount(0);
+            return;
+        }
+
+        // Create a map to aggregate commits by week to avoid duplicates
+        const weekMap = new Map<number, CommitActivity>();
+
+        // Process each week's data
+        data.forEach(week => {
+            if (!week || !week.week || !Array.isArray(week.days)) {
+                console.warn("Invalid week data:", week);
+                return;
+            }
+
+            const weekTimestamp = week.week;
+
+            if (weekMap.has(weekTimestamp)) {
+                // Merge with existing week data
+                const existingWeek = weekMap.get(weekTimestamp)!;
+                const mergedDays = existingWeek.days.map((count, index) => count + week.days[index]);
+                const mergedTotal = mergedDays.reduce((sum, count) => sum + count, 0);
+
+                weekMap.set(weekTimestamp, {
+                    week: weekTimestamp,
+                    days: mergedDays,
+                    total: mergedTotal
+                });
+            } else {
+                // Add new week data
+                weekMap.set(weekTimestamp, week);
+            }
+        });
+
+        // Convert map back to array and sort by week timestamp (newest first)
+        const processedData = Array.from(weekMap.values()).sort((a, b) => b.week - a.week);
+
+        // Calculate total commits
+        const total = processedData.reduce((sum, week) => sum + week.total, 0);
+        setTotalCommits(total);
+
+        // Calculate average commits per week
+        const avg = processedData.length > 0 ? total / processedData.length : 0;
+        setAverageCommitsPerWeek(avg);
+
+        // Find most active day
+        let maxDayCount = 0;
+        let maxDayIndex = 0;
+        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        // Create a map to aggregate commits by day of week
+        const dayMap = new Map<number, number>();
+
+        processedData.forEach(week => {
+            week.days.forEach((count, index) => {
+                const currentCount = dayMap.get(index) || 0;
+                dayMap.set(index, currentCount + count);
+            });
+        });
+
+        // Find the day with the most commits
+        dayMap.forEach((count, index) => {
+            if (count > maxDayCount) {
+                maxDayCount = count;
+                maxDayIndex = index;
+            }
+        });
+
+        setMostActiveDay(daysOfWeek[maxDayIndex]);
+        setMostActiveDayCount(maxDayCount);
+    };
+
+    // Add useEffect to process commit data when it changes
+    useEffect(() => {
+        if (commitActivity && commitActivity.length > 0) {
+            processCommitData(commitActivity);
+        }
+    }, [commitActivity]);
 
     return (
         <div className={styles.container}>
@@ -451,11 +602,48 @@ export default function Home() {
                     </p>
                 </div>
 
+                {/* GitHub Token Input */}
+                <div className={styles.tokenSection}>
+                    <button
+                        onClick={() => setShowTokenInput(!showTokenInput)}
+                        className={styles.tokenToggleButton}
+                    >
+                        {showTokenInput ? 'Hide GitHub Token Input' : 'Add GitHub Token (Increase Rate Limit)'}
+                    </button>
+
+                    {showTokenInput && (
+                        <div className={styles.tokenInputContainer}>
+                            <input
+                                type="password"
+                                value={githubToken}
+                                onChange={(e) => setGithubToken(e.target.value)}
+                                placeholder="Enter your GitHub Personal Access Token"
+                                className={styles.tokenInput}
+                            />
+                            <p className={styles.tokenInfo}>
+                                Adding a GitHub token increases your rate limit from 60 to 5000 requests per hour.
+                                <a
+                                    href="https://github.com/settings/tokens"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={styles.tokenLink}
+                                >
+                                    Create a token here
+                                </a>
+                            </p>
+                        </div>
+                    )}
+                </div>
+
                 {isRateLimited && (
                     <div className={styles.rateLimitWarning}>
-                        <p>⚠️ GitHub API rate limit reached (60 requests/hour limit). Some features may be limited.</p>
+                        <p>⚠️ GitHub API rate limit reached (60 requests/hour limit). Using demo data instead.</p>
                         <p className={styles.rateLimitInfo}>
                             GitHub's API limits unauthenticated requests to 60 per hour. This limit will reset automatically after an hour.
+                            {rateLimitInfo && (
+                                <span> Your rate limit will reset at {new Date(rateLimitInfo.reset * 1000).toLocaleTimeString()}.</span>
+                            )}
+                            You can try again later, continue using demo data, or add a GitHub token to increase your rate limit.
                         </p>
                     </div>
                 )}
@@ -501,6 +689,13 @@ export default function Home() {
                                 />
                             </div>
                         )}
+
+                        <TotalCommits
+                            totalCommits={totalCommits}
+                            averageCommitsPerWeek={averageCommitsPerWeek}
+                            mostActiveDay={mostActiveDay}
+                            mostActiveDayCount={mostActiveDayCount}
+                        />
                     </div>
                 )}
             </main>

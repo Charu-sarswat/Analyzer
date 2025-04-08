@@ -1,109 +1,233 @@
 .container {
-    width: 100%;
-    margin-top: 1rem;
     padding: 2rem;
-    background-color: white;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-    position: relative;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    animation: fadeIn 0.5s ease-out;
 }
 
-.container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 6px;
-    background: var(--gradient-primary);
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
 }
 
 .heading {
     font-size: 1.8rem;
-    margin-top: 0;
-    margin-bottom: 1.8rem;
-    color: var(--text-primary);
-    text-align: center;
-    font-weight: 700;
-    position: relative;
-    display: inline-block;
-    left: 50%;
-    transform: translateX(-50%);
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
 }
 
-.heading::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: var(--gradient-primary);
-    border-radius: var(--radius-sm);
-}
-
-/* Commit Statistics Styles */
-.commitStats {
+.timeRangeSelector {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    gap: 0.5rem;
+    background: #f5f5f5;
+    padding: 0.25rem;
+    border-radius: 8px;
+}
+
+.timeButton {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.timeButton:hover {
+    color: #333;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.timeButton.active {
+    background: #fff;
+    color: #1a1a1a;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.statsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.5rem;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
 }
 
 .statCard {
-    background-color: white;
-    padding: 2rem 1.5rem;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    min-width: 180px;
-    flex: 1;
-    text-align: center;
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
     position: relative;
     overflow: hidden;
-    transition: transform 0.3s var(--ease-bounce), box-shadow 0.3s ease;
-    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+    animation: fadeIn 0.5s ease-out;
+    animation-fill-mode: both;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 150px;
 }
 
-.statCard::before {
+.statCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    border-color: rgba(99, 102, 241, 0.2);
+}
+
+.statCard.hovered {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.statCard h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #666;
+    margin: 0 0 0.5rem 0;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.statCard h3::after {
     content: '';
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
-    width: 100%;
-    height: 4px;
-    background: var(--gradient-primary);
+    width: 30px;
+    height: 2px;
+    background: linear-gradient(90deg, #4a6cf7, #2e8b88);
+    border-radius: 2px;
 }
 
-.pulseOnHover:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
-}
-
-.statValue {
-    font-size: 2.5rem;
+.statCard p {
+    font-size: 1.8rem;
     font-weight: 700;
-    color: #222;
-    margin-bottom: 0.8rem;
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    position: relative;
+    margin: 0;
+    line-height: 1.2;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.statCounter {
-    display: inline-block;
-    position: relative;
-    animation: countUp 2s var(--ease-bounce) forwards;
+.statCard small {
+    display: block;
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.5rem;
+    opacity: 0.8;
 }
 
-@keyframes countUp {
+.statIcon {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+    background: rgba(99, 102, 241, 0.1);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.statCard:hover .statIcon {
+    opacity: 1;
+    transform: scale(1.1);
+    background: rgba(99, 102, 241, 0.2);
+}
+
+.statCard:hover p {
+    background: linear-gradient(135deg, #4a6cf7 0%, #2e8b88 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.chartsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.chartContainer {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    animation: fadeIn 0.5s ease-out;
+    animation-fill-mode: both;
+}
+
+.chartContainer h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin: 0 0 1rem 0;
+}
+
+.chartWrapper {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+.disclaimer {
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .timeRangeSelector {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .statsContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .chartsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .chartWrapper {
+        height: 250px;
+    }
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px);
     }
 
     to {
@@ -112,492 +236,26 @@
     }
 }
 
-.statDay {
-    display: inline-block;
-    position: relative;
-    animation: fadeInRotate 1.5s var(--ease-bounce) forwards;
+.statCard:nth-child(1) {
+    animation-delay: 0.1s;
 }
 
-@keyframes fadeInRotate {
-    from {
-        opacity: 0;
-        transform: rotateY(60deg);
-    }
-
-    to {
-        opacity: 1;
-        transform: rotateY(0);
-    }
+.statCard:nth-child(2) {
+    animation-delay: 0.2s;
 }
 
-.statLabel {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.2rem;
-    font-weight: 600;
+.statCard:nth-child(3) {
+    animation-delay: 0.3s;
 }
 
-.statSubLabel {
-    font-size: 0.9rem;
-    color: var(--text-light);
+.chartContainer:nth-child(1) {
+    animation-delay: 0.4s;
 }
 
-.statIcon {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    width: 24px;
-    height: 24px;
-    opacity: 0.2;
-    color: var(--primary);
-    transition: all 0.3s ease;
+.chartContainer:nth-child(2) {
+    animation-delay: 0.5s;
 }
 
-.statCard:hover .statIcon {
-    opacity: 0.6;
-    transform: scale(1.1);
-}
-
-/* Repository Distribution Styles */
-.repoDistribution {
-    background-color: white;
-    padding: 2rem;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    margin-bottom: 2.5rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid var(--border-light);
-}
-
-.repoDistribution::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: var(--gradient-cool);
-}
-
-.floating:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
-}
-
-.repoChartContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2rem;
-    padding: 1rem;
-}
-
-.repoPieChart {
-    width: 100%;
-    max-width: 320px;
-    margin: 0 auto;
-    position: relative;
-}
-
-.pieChartOverlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-}
-
-.pieChartCenterText {
-    background: white;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    animation: pulse 2s infinite alternate;
-}
-
-.pieChartCenterText span {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--primary);
-    line-height: 1;
-}
-
-.pieChartCenterText small {
-    font-size: 0.8rem;
-    color: var(--text-light);
-    margin-top: 0.2rem;
-}
-
-.repoStatsList {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-}
-
-.repoStatItem {
-    display: flex;
-    align-items: center;
-    padding: 1rem 1.2rem;
-    border-radius: var(--radius-md);
-    background-color: #f8fafc;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: 1px solid transparent;
-}
-
-.repoStatItem:hover {
-    background-color: #f1f5f9;
-    transform: translateX(8px);
-    border-color: var(--border-light);
-}
-
-.repoColorIndicator {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    margin-right: 1rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.repoName {
-    font-weight: 600;
-    flex: 2;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 150px;
-}
-
-.repoCommits {
-    margin-left: auto;
-    margin-right: 1.5rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-.repoPercentage {
-    min-width: 70px;
-    text-align: right;
-    font-weight: 700;
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.percentCircle {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: inline-block;
-}
-
-.subheading {
-    font-size: 1.4rem;
-    margin-top: 0;
-    margin-bottom: 1.5rem;
-    color: var(--text-primary);
-    text-align: center;
-    font-weight: 600;
-}
-
-/* GitHub-style heatmap */
-.heatmapContainer {
-    background-color: white;
-    padding: 2rem;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    margin-bottom: 2.5rem;
-    overflow-x: auto;
-    position: relative;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid var(--border-light);
-}
-
-.heatmapContainer::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, #40c463, #216e39);
-}
-
-.heatmapContainer:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
-}
-
-.noDataMessage {
-    text-align: center;
-    padding: 3rem 2rem;
-    color: #666;
-    font-style: italic;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    margin: 1.5rem 0;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.03);
-}
-
-.heatmap {
-    display: flex;
-    flex-direction: row;
-    margin-left: 2.5rem;
-    padding: 1rem 0;
-}
-
-.heatmapLabel {
-    margin-left: 2.5rem;
-    margin-bottom: 0.8rem;
-    font-weight: 500;
-    color: #555;
-}
-
-.heatmapDayLabels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.75rem;
-    color: #666;
-    font-weight: 500;
-}
-
-.heatmapDayLabels div {
-    width: 15px;
-    text-align: center;
-}
-
-.heatmapWeek {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-right: 4px;
-}
-
-.weekLabel {
-    font-size: 0.75rem;
-    color: #666;
-    width: 2.5rem;
-    text-align: right;
-    padding-right: 0.8rem;
-    font-weight: 500;
-}
-
-.heatmapDays {
-    display: flex;
-}
-
-.heatmapDay {
-    width: 15px;
-    height: 15px;
-    margin: 2px;
-    border-radius: 3px;
-    position: relative;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.heatmapDay:hover {
-    transform: scale(1.4);
-    z-index: 10;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-}
-
-.dayTooltip {
-    visibility: hidden;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    text-align: center;
-    border-radius: 6px;
-    padding: 6px 10px;
-    position: absolute;
-    z-index: 20;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-    font-size: 0.75rem;
-    opacity: 0;
-    transition: opacity 0.3s, transform 0.3s;
-    transform: translateX(-50%) translateY(5px);
-    font-weight: 500;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-}
-
-.heatmapDay:hover .dayTooltip {
-    visibility: visible;
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-
-.heatmapLegend {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 1.5rem;
-    font-size: 0.75rem;
-    color: #666;
-    font-weight: 500;
-}
-
-.heatmapLegendItem {
-    width: 15px;
-    height: 15px;
-    margin: 0 3px;
-    border-radius: 3px;
-    transition: transform 0.2s ease;
-}
-
-.heatmapLegendItem:hover {
-    transform: scale(1.2);
-}
-
-/* Chart containers */
-.dailyTrendChart {
-    background-color: white;
-    padding: 1.8rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    margin-bottom: 2.5rem;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.dailyTrendChart::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, #ff6b6b 0%, #ffc078 100%);
-}
-
-.dailyTrendChart:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
-}
-
-.charts {
-    display: flex;
-    flex-direction: column;
-    gap: 2.5rem;
-    margin-top: 0;
-}
-
-.chart {
-    background-color: white;
-    padding: 1.8rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.chart::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-}
-
-.chart:nth-child(1)::before {
-    background: linear-gradient(90deg, #748ffc 0%, #a3daff 100%);
-}
-
-.chart:nth-child(2)::before {
-    background: linear-gradient(90deg, #69db7c 0%, #8ce99a 100%);
-}
-
-.chart:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
-}
-
-.loading {
-    text-align: center;
-    padding: 3rem;
-    font-size: 1.1rem;
-    color: #666;
-    background-color: #f8f9fa;
-    border-radius: 12px;
-    margin: 1.5rem 0;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    position: relative;
-    overflow: hidden;
-}
-
-.loading::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, #4a6cf7, #2e8b88, #4a6cf7);
-    background-size: 200% 100%;
-    animation: loadingAnimation 1.5s infinite;
-    bottom: 0;
-    left: 0;
-}
-
-@keyframes loadingAnimation {
-    0% {
-        background-position: 100% 0;
-    }
-
-    100% {
-        background-position: 0 0;
-    }
-}
-
-.disclaimer {
-    margin-top: 2rem;
-    padding: 1rem;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    color: #666;
-    text-align: center;
-    border-left: 3px solid #ddd;
-}
-
-@media (min-width: 992px) {
-    .charts {
-        flex-direction: row;
-    }
-
-    .chart {
-        flex: 1;
-    }
-}
-
-@media (min-width: 768px) {
-    .repoChartContainer {
-        flex-direction: row;
-        align-items: flex-start;
-    }
-
-    .repoPieChart {
-        flex: 1;
-    }
-
-    .repoStatsList {
-        flex: 1;
-    }
+.chartContainer:nth-child(3) {
+    animation-delay: 0.6s;
 }

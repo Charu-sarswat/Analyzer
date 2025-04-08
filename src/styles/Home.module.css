@@ -148,7 +148,7 @@
     padding: 1rem 1.5rem;
     font-size: 1rem;
     background: var(--gradient-primary);
-    color: white;
+    color: #1a1a1a;
     border: none;
     border-radius: var(--radius-full);
     cursor: pointer;
@@ -267,7 +267,7 @@
     padding: 0.8rem 1.5rem;
     font-size: 0.95rem;
     background: var(--gradient-primary);
-    color: white;
+    color: #1a1a1a;
     border: 2px solid transparent;
     border-radius: var(--radius-full);
     cursor: pointer;
@@ -411,4 +411,83 @@
     60% {
         transform: translateX(4px);
     }
+}
+
+/* Token Section Styles */
+.tokenSection {
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 2rem;
+    animation: fadeIn 0.6s ease-in-out;
+    position: relative;
+}
+
+.tokenToggleButton {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.95rem;
+    background: white;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-sm);
+    margin: 0 auto;
+}
+
+.tokenToggleButton:hover {
+    background: rgba(99, 102, 241, 0.05);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.tokenInputContainer {
+    margin-top: 1rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    animation: slideUp 0.5s var(--ease-bounce) forwards;
+}
+
+.tokenInput {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-sm), 0 0 0 1px var(--border-light) inset;
+    transition: var(--transition);
+    background: white;
+    margin-bottom: 1rem;
+}
+
+.tokenInput:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), 0 0 0 1px var(--primary) inset;
+    transform: translateY(-2px);
+}
+
+.tokenInfo {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.tokenLink {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 0.5rem;
+    transition: var(--transition);
+}
+
+.tokenLink:hover {
+    text-decoration: underline;
 }
