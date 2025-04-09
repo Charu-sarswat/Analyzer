@@ -354,6 +354,53 @@
     animation: fadeIn 0.8s ease-in-out;
 }
 
+/* Controls container for search and demo toggle */
+.controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 1.5rem 0;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Demo toggle container */
+.demoToggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-md), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+/* Active demo mode button style */
+.activeDemo {
+    background: linear-gradient(45deg, #4f46e5, #06b6d4);
+    color: white;
+    box-shadow: var(--shadow-md), 0 0 15px rgba(99, 102, 241, 0.5);
+}
+
+.activeDemo:hover {
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(99, 102, 241, 0.6);
+}
+
+/* Demo mode note text */
+.demoNote {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 0.8rem;
+    text-align: center;
+}
+
 /* Animations */
 @keyframes fadeIn {
     from {
